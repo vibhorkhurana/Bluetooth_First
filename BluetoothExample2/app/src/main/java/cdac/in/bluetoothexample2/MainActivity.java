@@ -3,8 +3,10 @@ package cdac.in.bluetoothexample2;
 import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
@@ -22,6 +24,7 @@ public class MainActivity extends Activity {
     ListView lvDevice;
     ArrayAdapter<String> adapter;
     Set<BluetoothDevice> set;
+    IntentFilter intentFilter;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -30,6 +33,7 @@ public class MainActivity extends Activity {
         lvDevice = (ListView) findViewById(R.id.lvbtdevices);
         bluetoothAdapter = BluetoothAdapter.getDefaultAdapter(); //Initialising Bluetooth Adapter
         adapter = new ArrayAdapter<String>(MainActivity.this,android.R.layout.simple_list_item_1);
+        intentFilter = new IntentFilter(BluetoothDevice.ACTION_FOUND);
         lvDevice.setAdapter(adapter);
 
         }
@@ -60,7 +64,18 @@ public class MainActivity extends Activity {
 
     public void Find(View v)
     {
-
+        if(bluetoothAdapter.isDiscovering())
+        {
+            bluetoothAdapter.cancelDiscovery();
+            tvStatus.setText("Bluetooth discovery cancelled");
+        }
+        else
+        {
+            tvStatus.setText("Bluetooth is discovering");
+            adapter.clear();
+            bluetoothAdapter.startDiscovery();
+            registerReceiver(receiver, intentFilter);
+        }
     }
     public void List(View v) {
         adapter.clear();
@@ -81,4 +96,21 @@ public class MainActivity extends Activity {
             tvStatus.setText("Bluetooth is Now On!!");
         }
     }
+
+    BroadcastReceiver receiver = new BroadcastReceiver() {
+        @Override
+
+        public void onReceive(Context context, Intent intent) {
+            String Action = intent.getAction();
+            tvStatus.setText("Bluetooth is discovering--found");
+            if(BluetoothDevice.ACTION_FOUND.equals(Action))
+            {
+                tvStatus.setText("Bluetooth is discovering++found");
+                BluetoothDevice Btdevice = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
+                String name = Btdevice.getName();
+                String address = Btdevice.getAddress();
+                adapter.add(name+" : "+address);
+            }
+        }
+    };
 }
