@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -16,6 +17,7 @@ public class MainActivity extends Activity {
     BluetoothAdapter bluetoothAdapter;
     TextView tvStatus;
     ListView lvDevice;
+    ArrayAdapter<String> adapter;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -23,6 +25,8 @@ public class MainActivity extends Activity {
         tvStatus = (TextView) findViewById(R.id.tvBtStatus);
         lvDevice = (ListView) findViewById(R.id.lvbtdevices);
         bluetoothAdapter = BluetoothAdapter.getDefaultAdapter(); //Initialising Bluetooth Adapter
+        adapter = new ArrayAdapter<String>(MainActivity.this,android.R.layout.simple_list_item_1);
+        lvDevice.setAdapter(adapter);
     }
 
     public void On(View v)
